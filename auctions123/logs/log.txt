@@ -1,0 +1,6 @@
+INFO  2016-07-31 23:32:18,138 13395ms HomeController         Index              - Home/Index/ 
+INFO  2016-07-31 23:38:09,513 364770ms HomeController         Index              - Home/Index/ 
+INFO  2016-07-31 23:38:32,419 387677ms HomeController         Index              - Home/Index/ 
+INFO  2016-07-31 23:38:39,762 395019ms HomeController         MyOrders           - Home/MyOrders/ 
+INFO  2016-07-31 23:38:43,468 398726ms HomeController         MyOrders           - Home/MyOrders/ 
+INFO  2016-07-31 23:39:22,607 437864ms HomeController         Won                - Home/Won/ 

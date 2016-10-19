@@ -1,0 +1,94 @@
+﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.EntityFramework
+@using auctions123.Models
+@model PagedList.IPagedList<auctions123.Models.Auction>
+@using PagedList.Mvc;
+
+@{
+    var numOfTokens = 0l;
+    var userName = "";
+    if (User.Identity.IsAuthenticated)
+    {
+        var userStore = new UserStore<ApplicationUser>(new ApplicationDbContext());
+        var manager = new UserManager<ApplicationUser>(userStore);
+        var currentUser = manager.FindById(User.Identity.GetUserId());
+
+        numOfTokens = currentUser.numOfTokens;
+        userName = currentUser.UserName;
+    }
+}
+
+
+
+<link href="~/Content/StyleSheet1.css" rel="stylesheet" type="text/css" />
+<link href="~/Content/bootstrap-select.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="container">
+    <p id="username" hidden>@userName</p>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            if (item.stage != "DELETED")
+            {
+                <div class="col-xs-18 col-sm-6 col-md-3">
+                    <div class="thumbnail">
+                        <img src="data:image;base64,@Convert.ToBase64String(item.image)" style="height:300px; width:500px;" />
+                        <div class="caption" style="text-align:center;">
+                            <h4><a href='@Url.Action("Details", "Auctions", new { id = item.IdAuction })'>@Html.DisplayFor(modelItem => item.productName)</a></h4>
+                            @{
+                                TimeSpan time = TimeSpan.FromSeconds(item.duration);
+                                String timeS = time.ToString(@"dd\:hh\:mm\:ss");
+                                String lastBidder = "No winner!";
+                                if (item.stage == "READY")
+                                {
+                                    lastBidder = "It will start soon.";
+                                }
+                                try
+                                {
+                                    var lastBidderH = item.LastBidders.First();
+                                    lastBidder = lastBidderH.AspNetUser.Email;
+                                }
+                                catch (Exception e)
+                                {
+
+                                }
+                                long price = item.price + (long)item.priceChange;
+                            }
+
+                            <p id="@Html.Raw("Duration" + item.IdAuction)"><label>@timeS</label></p>
+                            <p><label style="color:#99182c;">Last bid made by:</label></p>
+                            <p id="@Html.Raw("LastBidder" + item.IdAuction)"><label>@lastBidder<br /></label></p>
+                            <p id="@Html.Raw("Price" + item.IdAuction)"><label>Price: @price [ Token ]</label></p>
+                            <p id="@Html.Raw("Stage" + item.IdAuction)"><label>@Html.DisplayFor(modelItem => item.stage)</label></p>
+
+                            @if (item.stage != "OPEN")
+                            {
+                                <button class="btn btn-danger btn-sm btn-bid" id="@Html.Raw("btn" + item.IdAuction)" type="button" style="background-color:#99182c" disabled>
+                                    BID
+                                </button>
+                            }
+                            else
+                            {
+                                if (Request.IsAuthenticated)
+                                {
+                                    <button class="btn btn-danger btn-sm btn-bid" id="@Html.Raw("btn" + item.IdAuction)" type="button" style="background-color:#99182c">
+                                        BID
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal" style="background-color:#99182c">  BID</button>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                                    }
+                                }
+    </div>
+
+    <div style="text-align:center;">
+        <text>@Html.PagedListPager(Model, page => Url.Action("Won", new { page }))</text>
+    </div>
+</div>
+  

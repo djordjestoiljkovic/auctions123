@@ -1,0 +1,83 @@
+﻿@model IEnumerable<auctions123.Models.Auction>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.productName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.duration)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.dateCreated)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.dateOpened)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.dateClosed)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.stage)
+        </th>
+        <th>
+           @Html.DisplayNameFor(model => model.image)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.price)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    if (item.stage != "DELETED")
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.productName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.duration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.dateCreated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.dateOpened)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.dateClosed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.stage)
+            </td>
+            <td>
+                <img src="data:image;base64,@System.Convert.ToBase64String(item.image)" style="height:200px; width:200px;"/>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.price)
+            </td>
+            <td>
+                @if (item.stage == "READY")
+                {
+                   @Html.ActionLink("Edit", "Edit", new { id = item.IdAuction }) <text>|</text> 
+                   @Html.ActionLink("Open", "Open", new { id = item.IdAuction }) <text>|</text>
+                }
+                @Html.ActionLink("Details", "Details", new { id = item.IdAuction }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.IdAuction })
+            </td>
+        </tr>
+        }
+    }
+
+</table>

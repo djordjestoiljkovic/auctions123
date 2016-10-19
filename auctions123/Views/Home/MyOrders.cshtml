@@ -1,0 +1,33 @@
+﻿@using auctions123.Models
+@model PagedList.IPagedList<Order>
+@using PagedList.Mvc;
+
+
+
+
+
+<link href="~/Content/StyleSheet1.css" rel="stylesheet" type="text/css" />
+<link href="~/Content/bootstrap-select.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-xs-18 col-sm-6 col-md-3">
+                <div class="thumbnail" style="background-color:#99182c;;">
+                    <div class="caption" style="text-align:center;color:#ffbbbc; ">
+                        <h4><a href='@Url.Action("Details", "Orders", new { id = item.IdOrder })' class="my-class"> @Html.DisplayFor(modelItem => @item.dateCreated)</a></h4>
+                        <p><label>Status: @item.Status</label></p>
+                        <p><label>Price: @item.Price</label></p>
+                        <p><label>Tokens: @item.NumOfTokens</label></p>
+                    </div>
+                </div>
+            </div>                     
+           }
+    </div>
+    <div style="text-align:center;">
+        <text>@Html.PagedListPager(Model, page => Url.Action("MyOrders", new { page }))</text>
+    </div>
+</div>
+
+

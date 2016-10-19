@@ -1,0 +1,200 @@
+﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.EntityFramework
+@using auctions123.Models
+@model auctions123.Models.Auction
+
+
+@{
+    var numOfTokens = 0L;
+    var userName = "";
+    if (User.Identity.IsAuthenticated)
+    {
+        var userStore = new UserStore<ApplicationUser>(new ApplicationDbContext());
+        var manager = new UserManager<ApplicationUser>(userStore);
+        var currentUser = manager.FindById(User.Identity.GetUserId());
+
+        numOfTokens = currentUser.numOfTokens;
+        userName = currentUser.UserName;
+    }
+}
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div>
+    <p id="username" hidden>@userName</p>
+    <div class="row">
+        @if (Model.stage != "DELETED")
+        {
+            <div class="col-xs-19 col-sm-8 col-md-5"></div>
+            <div class="col-xs-18 col-sm-6 col-md-3">
+                <div class="thumbnail">
+                    <img src="data:image;base64,@Convert.ToBase64String(Model.image)" style="height:300px; width:500px;" />
+                    <div class="caption" style="text-align:center;">
+                        <h4><a href='@Url.Action("Details", "Auctions", new { id = Model.IdAuction })'>@Html.DisplayFor(modelItem => Model.productName)</a></h4>
+                        @{
+                            TimeSpan time = TimeSpan.FromSeconds(Model.duration);
+                            String timeS = time.ToString(@"dd\:hh\:mm\:ss");
+                            String lastBidder = "No winner!";
+                            if (Model.stage == "READY")
+                            {
+                                lastBidder = "It will start soon.";
+                            }
+                            if (Model.LastBidders.Count > 0)
+                            {
+                                var lastBidderH = Model.LastBidders.First();
+                                lastBidder = lastBidderH.AspNetUser.Email;
+                            }
+                            long price = Model.price + (long)Model.priceChange;
+                        }
+
+                        <p id="@Html.Raw("Duration" + Model.IdAuction)"><label>@timeS</label></p>
+                        <p><label style="color:#99182c;">Last bid made by:</label></p>
+                        <p id="@Html.Raw("LastBidder" + Model.IdAuction)"><label>@lastBidder<br /></label></p>
+                        <p id="@Html.Raw("Price" + Model.IdAuction)"><label>Price: @price [ Token ]</label></p>
+                        <p id="@Html.Raw("Stage" + Model.IdAuction)"><label>@Html.DisplayFor(modelItem => Model.stage)</label></p>
+
+                        @if (Model.stage != "OPEN")
+                        {
+                            <button class="btn btn-danger btn-sm btn-bid" id="@Html.Raw("btn" + Model.IdAuction)" type="button" style="background-color:#99182c" disabled>
+                                BID
+                            </button>
+                        }
+                        else
+                        {
+                            if (Request.IsAuthenticated)
+                            {
+                                <button class="btn btn-danger btn-sm btn-bid" id="@Html.Raw("btn" + Model.IdAuction)" type="button" style="background-color:#99182c">
+                                    BID
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal" style="background-color:#99182c">  BID</button>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+                            }
+    </div>
+    <div class="row">
+        <div class="col-xs-18 col-sm-6 col-md-3"></div>
+        <table class="table">
+            <thead class="thead" style="background-color:#99182c; color:#ffbbbc;">
+                <tr>
+                    <th>Email</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.bids)
+                {
+                    <tr>
+                        <td>@item.AspNetUser.Email</td>
+                        <td>@item.AspNetUser.FirstName</td>
+                        <td>@item.AspNetUser.LastName</td>
+                        <td>@item.Date</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <p>
+            @Html.ActionLink("Back to List", "Index","Home")
+        </p>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#99182c; color:#ffbbbc;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">You are not logged in.</h4>
+                </div>
+                <div class="modal-body">
+                    <p><label>Please login if you have account, or register if you don't have one. So you can make bids.</label> </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" style="background-color:#99182c">@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "my-class" })</button>
+                    <button class="btn btn-default" style="background-color:#99182c">@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "my-class" })</button>
+                    <button class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal2" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#99182c; color:#ffbbbc;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">You don't have enough tokens to make this bid.</h4>
+                </div>
+                <div class="modal-body">
+                    <p><label>Please buy more tokens. So you can make bids.</label> </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" style="background-color:#99182c">@Html.ActionLink("Buy Tokens", "CreateOrder", "Orders", routeValues: null, htmlAttributes: new { @class = "my-class" })</button>
+                    <button class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/Scripts/bootstrap-select.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+
+            $(function () {
+
+                var my_hub = $.connection.auctionsHub;
+
+
+                my_hub.client.timerTick = function (IDAuction, Stage, Duration, LastBidder, Price) {
+                    $("#" + "Stage" + IDAuction).html("<label>" + Stage + "</label>");
+                    if (($("#" + "LastBidder" + IDAuction).text() != LastBidder) && ($("#" + "LastBidder" + IDAuction).text() == $("#" + "username").text())) {
+                        $("#" + "thumbnail" + IDAuction).css("background-color", "#ffbbbc")
+                        $("#" + "LastBidder" + IDAuction).html("<label style = 'color:#99182c;'>" + LastBidder + "<br />" + "</label>");
+                    } else {
+                        $("#" + "thumbnail" + IDAuction).css("background-color", "white")
+                        $("#" + "LastBidder" + IDAuction).html("<label>" + LastBidder + "<br />" + "</label>");
+                    }
+                    $("#" + "Duration" + IDAuction).html("<label>" + Duration + "</label>");
+                    $("#" + "Price" + IDAuction).html("<label>" + "Price: " + Price + " [ Token ]" + "</label>");
+                    if (Stage != "OPEN") {
+                        $("#" + "btn" + IDAuction).prop("disabled", true);
+                        if (Stage == "EXPIRED") {
+                            $("#" + "LastBidder" + IDAuction).html("<label>" + "No winner!" + "<br />" + "</label>");
+                        }
+                    }
+                };
+
+      
+                $.connection.hub.start().done(function () {
+                    $('.btn-bid').click(function (event) {
+                        var idBtnJquery = $(event.target).attr('id');
+                        var IDAuc = idBtnJquery.substring(3, idBtnJquery.length);
+                        var clientEmail = $("#" + "username").text();
+                        my_hub.server.send(IDAuc);
+                    });
+                });
+
+                my_hub.client.tokenswarning = function (email) {
+                    var clientEmail = $("#" + "username").text();
+                    if (email == clientEmail) {
+                        $('#myModal2').modal('toggle');
+                    }
+                };
+            });
+    </script>
+}

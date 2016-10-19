@@ -1,0 +1,46 @@
+﻿@model IEnumerable<auctions123.Models.Bid>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.AspNetUser.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Auction.productName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Date)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.AspNetUser.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Auction.productName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Date)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.IdBid }) |
+            @Html.ActionLink("Details", "Details", new { id=item.IdBid }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.IdBid })
+        </td>
+    </tr>
+}
+
+</table>

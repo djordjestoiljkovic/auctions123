@@ -1,0 +1,29 @@
+{
+  "siteName": {
+    "value": "auctionsIep"
+  },
+  "hostingPlanName": {
+    "value": "sd130612d"
+  },
+  "siteLocation": {
+    "value": "North Europe"
+  },
+  "sku": {
+    "value": "Free"
+  },
+  "workerSize": {
+    "value": "0"
+  },
+  "siteMode": {
+    "value": "Limited"
+  },
+  "computeMode": {
+    "value": "0"
+  },
+  "subscriptionId": {
+    "value": "728d0350-0ceb-4739-9abf-30f31993e657"
+  },
+  "resourceGroup": {
+    "value": "sd130612d_resources_g1"
+  }
+}
